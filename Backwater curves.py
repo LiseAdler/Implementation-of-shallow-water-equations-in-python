@@ -177,6 +177,7 @@ h_max = h_max_solution(hn, 3, x, theta, K, q)
 
 h0= h_max
 x = np.linspace(0, -2500, 500)
+bed = x * -np.tan(theta)
 sol = solve_bresse(h0, x, theta, K, q)
 Sol = bed + sol[:, 0]
 u = velocity(q, sol)
@@ -346,6 +347,40 @@ plt.ylabel('h[m]')
 #plt.title('Backwater curve between gate and dam')
 plt.legend()
 plt.savefig(save_path + 'backwater_curve_combined.png')
+
+#%% complete backwater curve with slope
+plt.close('all')
+x_sol = np.linspace(0,20,1000)
+bed = x_sol* -np.tan(theta)
+x_h1 = np.linspace(0, x1_con, 500)
+sol_h1 = solve_bresse(h0, x_h1, theta, K, q)[:, 0]
+bed_h1 = x_h1* -np.tan(theta)
+sol_h1 = bed_h1 + sol_h1
+x_h2 = np.linspace(0, x2_con, 500)
+sol_h2 = solve_bresse(h0_1, x_h2, theta, K, q)[:, 0]
+bed_h2 = (x_h2)* -np.tan(theta)-20*np.tan(theta)
+sol_h2 = (bed_h2 + sol_h2)
+x_h2_1 = 20 + x_h2
+ellipse = Ellipse((x1_con, x1_con*-np.tan(theta)+ H1 + H_jump / 2), 0.1, H_jump, color='red', alpha=0.5)
+plt.figure(figsize=(4, 3))
+plt.plot(x_h1, sol_h1, label ='Water surface profile', color = 'blue')
+plt.plot(x_h2_1, sol_h2, color='blue')
+plt.plot(x_sol, bed, color='brown', linestyle='-', label='Bottom slope')
+plt.fill_between(x_h1, bed_h1, sol_h1, color='blue', alpha=0.2)
+plt.fill_between(x_h2_1, bed_h2, sol_h2, color='blue', alpha=0.2)
+plt.plot(x_sol, hn*np.ones(1000)+bed, color='red', linestyle='--', label='Normal flow depth')
+plt.plot(x_sol, hc*np.ones(1000)+bed, color='green', linestyle='--', label='Critical flow depth')
+plt.gca().add_patch(ellipse)
+plt.text(x1_con +2, x1_con*-np.tan(theta)+ H1 + H_jump / 2 + 0.06 , 'Hydraulic Jump', color='red', ha='center', va='center')
+plt.xlabel('x [m]')
+plt.ylabel('D [m]')
+#plt.title('Backwater curve between gate and dam')
+ax=plt.gca()
+ax.set_position([0.2, 0.2,0.7,0.7])
+ax.set_ylim([-0.45,0.1])
+plt.legend()
+plt.savefig(save_path + 'backwater_curve_combined.png')
+
 
 
 #%% specific energy and pressure loss
